@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Partido</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .team-names {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .team-names input {
+            padding: 15px;
+            font-size: 18px;
+            width: 48%;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .team {
+            margin: 30px 0;
+        }
+
+        .team h2 {
+            margin: 10px 0;
+            font-size: 24px;
+            color: #444;
+        }
+
+        .team p {
+            font-size: 48px;
+            margin: 5px 0 20px;
+            font-weight: bold;
+            color: #2196F3;
+        }
+
+        .team input {
+            padding: 10px;
+            font-size: 16px;
+            width: 80%;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .team button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .team button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .card-square {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            margin: 5px;
+            border: 1px solid #000;
+        }
+
+        .yellow-card {
+            background-color: yellow;
+        }
+
+        .red-card {
+            background-color: red;
+        }
+
+        .log {
+            margin: 20px 0;
+        }
+
+        .log h2 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #eee;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 600px) {
+            .team-names {
+                flex-direction: column;
+            }
+
+            .team-names input {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .team input {
+                width: 90%;
+            }
+
+            .team button {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Registro de Partido</h1>
+        <div class="team-names">
+            <input type="text" id="local-team-name" placeholder="Nombre del equipo local">
+            <input type="text" id="visitor-team-name" placeholder="Nombre del equipo visitante">
+        </div>
+        <div class="team">
+            <h2 id="local-team-header">Equipo Local</h2>
+            <p id="local-score">0</p>
+            <input type="text" id="local-scorer" placeholder="Nombre del anotador">
+            <button onclick="addGoal('local')">Añadir Gol</button>
+            <input type="text" id="local-card-player" placeholder="Nombre del jugador para tarjeta">
+            <div>
+                <div class="card-square yellow-card" title="Tarjeta Amarilla"></div>
+                <button onclick="addCard('local', 'yellow')">Tarjeta Amarilla</button>
+                <div class="card-square red-card" title="Tarjeta Roja"></div>
+                <button onclick="addCard('local', 'red')">Tarjeta Roja</button>
+            </div>
+        </div>
+        <div class="team">
+            <h2 id="visitor-team-header">Equipo Visitante</h2>
+            <p id="visitor-score">0</p>
+            <input type="text" id="visitor-scorer" placeholder="Nombre del anotador">
+            <button onclick="addGoal('visitor')">Añadir Gol</button>
+            <input type="text" id="visitor-card-player" placeholder="Nombre del jugador para tarjeta">
+            <div>
+                <div class="card-square yellow-card" title="Tarjeta Amarilla"></div>
+                <button onclick="addCard('visitor', 'yellow')">Tarjeta Amarilla</button>
+                <div class="card-square red-card" title="Tarjeta Roja"></div>
+                <button onclick="addCard('visitor', 'red')">Tarjeta Roja</button>
+            </div>
+        </div>
+        <div class="log">
+            <h2>Registro de Eventos</h2>
+            <ul id="event-log"></ul>
+        </div>
+    </div>
+    <script>
+        let localScore = 0;
+        let visitorScore = 0;
+        const eventLog = document.getElementById('event-log');
+
+        document.getElementById('local-team-name').addEventListener('input', updateTeamNames);
+        document.getElementById('visitor-team-name').addEventListener('input', updateTeamNames);
+
+        function updateTeamNames() {
+            const localTeamName = document.getElementById('local-team-name').value;
+            const visitorTeamName = document.getElementById('visitor-team-name').value;
+
+            document.getElementById('local-team-header').textContent = localTeamName ? localTeamName : 'Equipo Local';
+            document.getElementById('visitor-team-header').textContent = visitorTeamName ? visitorTeamName : 'Equipo Visitante';
+        }
+
+        function addGoal(team) {
+            let scorer = '';
+            if (team === 'local') {
+                localScore++;
+                document.getElementById('local-score').textContent = localScore;
+                scorer = document.getElementById('local-scorer').value;
+                logEvent(`Gol del equipo local${scorer ? ' por ' + scorer : ''}`);
+            } else if (team === 'visitor') {
+                visitorScore++;
+                document.getElementById('visitor-score').textContent = visitorScore;
+                scorer = document.getElementById('visitor-scorer').value;
+                logEvent(`Gol del equipo visitante${scorer ? ' por ' + scorer : ''}`);
+            }
+        }
+
+        function addCard(team, color) {
+            const teamName = team === 'local' ? document.getElementById('local-team-header').textContent : document.getElementById('visitor-team-header').textContent;
+            const player = team === 'local' ? document.getElementById('local-card-player').value : document.getElementById('visitor-card-player').value;
+            const cardType = color === 'yellow' ? 'Tarjeta Amarilla' : 'Tarjeta Roja';
+            logEvent(`${cardType} para ${player ? player + ' del ' : ''}${teamName}`);
+        }
+
+        function logEvent(event) {
+            const li = document.createElement('li');
+            li.textContent = event;
+            eventLog.appendChild(li);
+        }
+    </script>
+</body>
+</html>
